@@ -1,9 +1,21 @@
 {
   "name": "react-handler-hooks",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "React hooks for persistent and parameterizable callbacks",
-  "author": "Ariel Jurkowski <ariel.jurkowski@gmail.com>",
+  "author": {
+    "url": "https://github.com/ArielJurkowski",
+    "email": "arieljurkowski@gmail.com",
+    "name": "Ariel Jurkowski"
+  },
   "license": "MIT",
+  "homepage": "https://github.com/ArielJurkowski/react-handler-hooks",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ArielJurkowski/react-handler-hooks.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ArielJurkowski/react-handler-hooks/issues"
+  },
   "main": "dist/index.js",
   "directories": {
     "lib": "dist"
