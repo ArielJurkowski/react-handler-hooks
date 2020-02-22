@@ -100,8 +100,8 @@ return (
   </>
 );
 ```
-## TODO
-- Performance tests in comparision with **useCallback**
+## Benchmark
+Check out the **benchmark** folder.
 ## Contact
 E-mail: [ariel.jurkowski@gmail.com](mailto:ariel.jurkowski@gmail.com)  
 Send me a nice message if you're using this!
