@@ -21,6 +21,7 @@
   "exclude": [
     "./test",
     "./dist",
-    "./node_modules"
+    "./node_modules",
+    "./benchmark"
   ]
 }

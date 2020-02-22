@@ -1,10 +1,10 @@
 {
   "name": "react-handler-hooks",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "React hooks for persistent and parameterizable callbacks",
   "author": {
     "url": "https://github.com/ArielJurkowski",
-    "email": "arieljurkowski@gmail.com",
+    "email": "ariel.jurkowski@gmail.com",
     "name": "Ariel Jurkowski"
   },
   "license": "MIT",
@@ -32,9 +32,9 @@
     "handlers",
     "callback",
     "use",
-    "callback",
     "usecallback",
     "usehandler",
+    "usehandlers",
     "useparamshandler",
     "param",
     "params",

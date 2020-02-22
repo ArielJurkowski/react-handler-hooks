@@ -2,7 +2,7 @@
 React hooks for persistent and parameterizable callbacks
 ## Installation
 ```bash
-npm install react-handler-hooks
+npm i react-handler-hooks
 ```
 ## What are these?
 Two hooks that can fully replace the useCallback hook: **useHandler** and **useParamsHandler**. Hooks return function proxies for your callbacks.
@@ -100,10 +100,10 @@ return (
   </>
 );
 ```
-## TODO
-- Performance tests in comparision with **useCallback**
+## Benchmark
+Check out the **benchmark** folder.
 ## Contact
-E-mail: [arieljurkowski@gmail.com](mailto:arieljurkowski@gmail.com)  
+E-mail: [ariel.jurkowski@gmail.com](mailto:ariel.jurkowski@gmail.com)  
 Send me a nice message if you're using this!
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
