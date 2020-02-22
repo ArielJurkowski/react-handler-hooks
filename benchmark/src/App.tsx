@@ -43,7 +43,7 @@ const App: FC = () => {
   const onFinish = useCallback(
     (ms: number) => {
       let resultsRow = resultsRef.current[resultsRef.current.length - 1];
-      resultsRow = [...resultsRow, ms];
+      resultsRow = [...resultsRow, Math.round(ms)];
       const newResults = [...resultsRef.current.slice(0, resultsRef.current.length - 1), resultsRow];
       setResults(newResults);
       if (currentBenchmarkRef.current >= Benchmarks.length - 1) {

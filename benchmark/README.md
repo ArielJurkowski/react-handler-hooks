@@ -19,5 +19,5 @@ npm run benchmark
   - useHandler is on par or faster than useCallback
   - useParamsHandler is faster than using dataset
 
-- useHandler is always slower than useCallback that never changes
-- useParamsHandler is always slower than useCallback+dataset that never changes
+- useHandler is always slower than useCallback that never changes, but barely
+- useParamsHandler is always slower than useCallback+dataset that never changes, but barely
