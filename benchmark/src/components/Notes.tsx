@@ -5,10 +5,10 @@ const Notes: FC = () => {
   return (
     <section>
       {Benchmarks.map(description => (
-        <>
+        <React.Fragment key={description.name}>
           <h1>{description.name}</h1>
           <p>{description.notes}</p>
-        </>
+        </React.Fragment>
       ))}
     </section>
   );

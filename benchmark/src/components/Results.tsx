@@ -11,7 +11,7 @@ const Results: FC<Props> = ({ results }) => {
       <thead>
         <tr>
           {Benchmarks.map(description => (
-            <th>{description.name}</th>
+            <th key={description.name}>{description.name}</th>
           ))}
         </tr>
       </thead>
