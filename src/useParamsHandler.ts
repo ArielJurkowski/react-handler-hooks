@@ -1,36 +1,36 @@
-import { Key, useRef } from 'react';
+import {DependencyList, Key, useRef} from 'react';
 
-interface PassedCallback {
+interface StoredCallbackData {
   function: () => any;
-  outerArgs?: any[];
+  params: HandlerParams;
 }
 
-export function useParamsHandler<K extends Key, I extends unknown[] = []>(callback: (key: K, ...args: I) => any): (key: K) => (...args: I) => any;
-export function useParamsHandler<K extends Key, T2, I extends unknown[] = []>(callback: (key: K, b: T2, ...args: I) => any): (key: K, b: T2) => (...args: I) => any;
-export function useParamsHandler<K extends Key, T2, T3, I extends unknown[] = []>(callback: (key: K, b: T2, c: T3, ...args: I) => any): (key: K, b: T2, c: T3) => (...args: I) => any;
-export function useParamsHandler<K extends Key, T2, T3, T4, I extends unknown[] = []>(callback: (key: K, b: T2, c: T3, d: T4, ...args: I) => any): (key: K, b: T2, c: T3, d: T4) => (...args: I) => any;
-export function useParamsHandler<K extends Key, T2, T3, T4, T5, I extends unknown[] = []>(callback: (key: K, b: T2, c: T3, d: T4, e: T5, ...args: I) => any): (key: K, b: T2, c: T3, d: T4, e: T5) => (...args: I) => any;
-export function useParamsHandler<K extends Key, T2, T3, T4, T5, T6, I extends unknown[] = []>(callback: (key: K, b: T2, c: T3, d: T4, e: T5, f: T6, ...args: I) => any): (key: K, b: T2, c: T3, d: T4, e: T5, f: T6) => (...args: I) => any;
-export function useParamsHandler<K extends Key, T2, T3, T4, T5, T6, T7, I extends unknown[] = []>(callback: (key: K, b: T2, c: T3, d: T4, e: T5, f: T6, g: T7, ...args: I) => any): (key: K, b: T2, c: T3, d: T4, e: T5, f: T6, g: T7) => (...args: I) => any;
-export function useParamsHandler(callback:  (...args: any[]) => any) {
-  const passedCallbackMap = useRef(new Map<Key, PassedCallback>());
+export type HandlerParams = Key | { key: Key };
+
+export function useParamsHandler<P extends HandlerParams, T extends unknown[] = [], R = any>(callback: (params: P, ...args: T) => R, deps?: DependencyList): (params: P) => (...args: T) => R {
+  const depsRef = useRef<DependencyList | undefined>(deps);
+  const depsChanged = !depsRef.current !== !deps ||
+    (deps && depsRef.current && deps.length === depsRef.current.length && depsRef.current.find((dep, index) => deps[index] !== dep));
+  depsRef.current = deps;
+  const newCallbackDataMap = new Map<Key, StoredCallbackData>();
+  const storedCallbackDataMap = useRef(newCallbackDataMap);
+  if (depsChanged) {
+    storedCallbackDataMap.current = newCallbackDataMap;
+  }
   const callbackRef = useRef(callback);
   callbackRef.current = callback;
-  return (...outerArgs: any[]) => {
-    const key: Key = outerArgs[0]!;
-    let callbackData = passedCallbackMap.current.get(key);
-    if (!callbackData) {
-      const newFunction = (...innerArgs: any[]) => {
-        const outerArgs = passedCallbackMap.current.get(key)!.outerArgs;
-        callbackRef.current(...outerArgs!.concat(innerArgs));
-      };
-      callbackData = {
-        function: newFunction,
-        outerArgs: outerArgs
-      };
-      passedCallbackMap.current.set(key, callbackData);
+  return (params: HandlerParams) => {
+    const key: Key = typeof params === 'object' ? params.key! : params;
+    let callbackData = storedCallbackDataMap.current.get(key);
+    if (callbackData) {
+      storedCallbackDataMap.current.get(key)!.params = params;
     } else {
-      passedCallbackMap.current.get(key)!.outerArgs = outerArgs;
+      const newFunction = (...args: T) => {
+        const retrievedParams = storedCallbackDataMap.current.get(key)!.params as P;
+        callbackRef.current(retrievedParams, ...args);
+      };
+      callbackData = { function: newFunction, params };
+      storedCallbackDataMap.current.set(key, callbackData);
     }
     return callbackData!.function;
   };

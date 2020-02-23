@@ -1,4 +1,5 @@
-import React, { FC, memo, useCallback } from 'react';
+import React, { FC, memo } from 'react';
+import {useHandler} from '../hooks/useHandler';
 
 interface Props {
   value: number;
@@ -9,12 +10,9 @@ interface Props {
 
 const NumberInput: FC<Props> = props => {
 
-  const onInputChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onInputChange = useHandler((event: React.ChangeEvent<HTMLInputElement>) => {
       props.onChange(Math.floor(Number.parseFloat(event.target.value)));
-    },
-    [props.onChange]
-  );
+  });
 
   return (
     <label>

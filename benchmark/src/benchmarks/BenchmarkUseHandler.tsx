@@ -7,9 +7,8 @@ import {useHandler} from '../hooks/useHandler';
 const BenchmarkUseHandler: FC<BenchmarkProps> = props => {
   const tools = useBenchmark(props);
 
-  const callback = useHandler<string, number, boolean, HTMLDivElement>(
-    (a, b, c, element) => {}
-  );
+  const callback = useHandler((a: string, b: number, c: boolean, element: HTMLDivElement) => {
+  });
 
   return (
     <>
