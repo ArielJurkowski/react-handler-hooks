@@ -1,4 +1,4 @@
-import { Key, useLayoutEffect, useRef } from 'react';
+import { Key, useRef } from 'react';
 
 interface PassedCallback {
   function: () => any;
@@ -15,9 +15,7 @@ export function useParamsHandler<K extends Key, T2, T3, T4, T5, T6, T7, I extend
 export function useParamsHandler(callback:  (...args: any[]) => any) {
   const passedCallbackMap = useRef(new Map<Key, PassedCallback>());
   const callbackRef = useRef(callback);
-  useLayoutEffect(() => {
-    callbackRef.current = callback;
-  });
+  callbackRef.current = callback;
   return (...outerArgs: any[]) => {
     const key: Key = outerArgs[0]!;
     let callbackData = passedCallbackMap.current.get(key);
