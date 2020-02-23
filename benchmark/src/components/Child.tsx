@@ -1,4 +1,4 @@
-import React, {FC, memo, useEffect, useLayoutEffect, useMemo, useRef} from 'react';
+import React, {FC, memo, useEffect, useMemo, useRef} from 'react';
 import Node from './Node';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {
@@ -12,9 +12,7 @@ const Child: FC<Props> = ({ nodeCount, callback, callbackTrigger, ...divProps })
   const divRef = useRef<HTMLDivElement>(null);
 
   const callbackRef = useRef(callback);
-  useLayoutEffect(() => {
-    callbackRef.current = callback
-  });
+  callbackRef.current = callback;
 
   useEffect(
     () => {

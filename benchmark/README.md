@@ -1,6 +1,7 @@
 ## react-handler-hooks-benchmark
 
 ```bash
+npm run install
 npm run benchmark
 ```
 

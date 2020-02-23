@@ -1,34 +1,35 @@
-# 🐱 react-handler-hooks 🐱
-React hooks for persistent and parameterizable callbacks
+# 🐱 react-handler-hooks
+React hooks for persistent and parameterizable callbacks - useCallback on steroids!
 ## Installation
 ```bash
 npm i react-handler-hooks
 ```
 ## What are these?
-Two hooks that can fully replace the useCallback hook: **useHandler** and **useParamsHandler**. Hooks return function proxies for your callbacks.
+Two hooks that fully replace the useCallback hook: **useHandler** and **useParamsHandler**. And they have many benefits!
 #### Pros
-- Hooks will **always** return the same function, this means children will never rerender because of a callback change.
-- No dependency list needed, because hooks always use fresh callbacks. Your state values from **useState** will always be current in your callbacks.
-- Supports dynamic parameters.
+- Hooks will return the same function on each render, this means children will never rerender because of a callback change.
+- No dependency list needed, because hooks always use fresh callbacks internally. Your state values from useState will always be fresh in your callbacks.
+- Supports passed parameters and they can even be dynamic.
 - Full type safety with TypeScript.
-- Cleaner code, less headaches!
+- Optional dependency list, useful for render props.
+- useHandler is fully reverse compatible with useCallback.
+- Cleaner code, easier debugging, less headaches!
+
 #### Cons
-- **useParamsHandler** first parameter is a key and needs to be a number or string. You need to be cautious with it, just like with the key property for JSX elements. 
-- **useHandler** internally uses 3 hooks and **useParamsHandler** uses 4. 
-- **useParamsHandler** also memoizes function callbacks for each key.
-- The hooks are technically slower than **useCallback**, but they will give you the lost performance back (and more) in lack of rerenders.
+- **useParamsHandler** needs a unique key. You need to be cautious with it, just like with the key property for JSX elements. 
+- The hooks by themselves are technically (but barely) slower than **useCallback**, but they will give you the lost (and much more) performance back in lack of re-renders.
 ## useHandler
-Work just like a normal **useCallback**, but has extra magic mentioned in the pros section!
+Works and looks just like a normal **useCallback**, but you don't need to put dependencies.
 ```typescript jsx
 useHandler(() => {
   // no params
 });
 
-useHandler<React.MouseEvent>(event => {
+useHandler((event: React.MouseEvent) => {
   // single param
 });
 
-useHandler<number, string>((num, str) => {
+useHandler((num: number, str: string) => {
  // two params etc...
 });
 ```
@@ -36,14 +37,12 @@ useHandler<number, string>((num, str) => {
 const [clicks, setClicks] = useState<number>(0);
 const [timestamp, setTimestamp] = useState<number>(0);
 
-const onClick = useHandler<React.MouseEvent>(
-  event => {
-    // no need for function (clicks => clicks + 1) in setter
-    // nor adding clicks to dep list!
-    setClicks(clicks + 1);
-    setTimestamp(Math.floor(event.timeStamp));
-  }
-);
+const onClick = useHandler((event: React.MouseEvent) => {
+  // no need for function (clicks => clicks + 1) in setter
+  // nor adding clicks to dep list!
+  setClicks(clicks + 1);
+  setTimestamp(Math.floor(event.timeStamp));
+});
 
 return (
   <h1 onClick={onClick}>
@@ -52,56 +51,58 @@ return (
 );
 ```
 ## useParamsHandler
-Allows for passing parameters that don't originate from the original event callback. First parameter is a key. The hook returns a callback creator which returns the same callback for each unique key.
-
-The last generic type is a tuple, it describes the parameters you'll recieve from the original event callback (ex. MouseEvent from onClick). You don't have to include it.
+Allows for passing parameters that don't originate from the original callback. First parameter is a key or object with your params that has a key property. The hook returns a callback creator which returns the same callback for each unique key.
 ```typescript jsx
-useParamsHandler<number>(userId => {
-  // just 1 dynamic parameter (which is the key)
+useParamsHandler((userId: string | number) => {
+  // 1 passed param (which is the key)
 });
 
-useParamsHandler<number, string>((userId, str) => {
-  // two dynamic parameters
+useParamsHandler((params: { key: number, str: string }) => {
+  // passed params object if you need multiple params
 });
 
-useParamsHandler<number, string, [React.MouseEvent]>((num, str, event) => {
- // two dynamic parameters and one original parameter
+useParamsHandler((params: { key: string, num: number }, e: React.MouseEvent) => {
+  // passed params and callback params
 });
 
-useParamsHandler<number, string, [string[], string]>((num, str, users, str2) => {
- // two dynamic parameters and two original parameters
+useParamsHandler((key: number, usersIds: string[], data: any) => {
+ // 1 passed param and 2 callback params
 });
 ```
 ```typescript jsx
 const [clickedName, setClickedName] = useState<string>();
-const [randomNumber, setRandomNumber] = useState<number>(0);
 const [timestamp, setTimestamp] = useState<number>(0);
 
-const onClick = useParamsHandler<string, number, [React.MouseEvent]>(
-  (name, newRandomNumber, event) => {
-    setClickedName(name);
-    setRandomNumber(newRandomNumber);
-    setTimestamp(Math.floor(event.timeStamp));
-  }
-);
+const onClick = useParamsHandler((name: string, event: React.MouseEvent) => {
+  setClickedName(name);
+  setTimestamp(Math.floor(event.timeStamp));
+});
 
 return (
   <>
-    <h1 onClick={onClick('Ariel', Math.random())}>
+    <h1 onClick={onClick('Ariel')}>
       Ariel
     </h1>
-    <h1 onClick={onClick('John', Math.random())}>
+    <h1 onClick={onClick('John')}>
       John
     </h1>
-    <h1 onClick={onClick('Mary', Math.random())}>
+    <h1 onClick={onClick('Mary')}>
       Mary
     </h1>
-    {clickedName && `Clicked on ${clickedName} at ${timestamp}. Random number is ${randomNumber}`}
+    {clickedName && `Clicked on ${clickedName} at ${timestamp}!`}
   </>
 );
 ```
+## DependencyList
+Both hooks support an **optional** second parameter with a DependencyList that is just like the DependencyList in useEffect, useLayoutEffect or useCallback.
+
+This is only useful when you actually do want to get a brand new function into your child components. A very good examples are render props.
+
+These hooks still have advantages over useCallback even if you're using a deplist, but they're mainly for you to not switch back between useCallback and these hooks.
+
 ## Benchmark
 Check out the **benchmark** folder.
+
 ## Contact
 E-mail: [ariel.jurkowski@gmail.com](mailto:ariel.jurkowski@gmail.com)  
 Send me a nice message if you're using this!

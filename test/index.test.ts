@@ -9,31 +9,59 @@ beforeEach(() => clearAllMocks());
 
 describe('useHandler', () => {
 
-  test('should return a function if we pass callback without params', () => {
+  test('should return a function if we pass callback', () => {
     const testRender = renderHook(
       () => useHandler(sampleCallback)
     );
     expect(typeof testRender.result.current).toBe('function');
   });
 
-  test('should return a function if we pass callback', () => {
-    const testRender = renderHook(
-      () => useHandler<string, number>(sampleCallback)
-    );
-    expect(typeof testRender.result.current).toBe('function');
-  });
-
   test('should return same function after rerender', () => {
-    const testRender = renderHook(() => useHandler<string, number>(sampleCallback));
+    const testRender = renderHook(
+      () => useHandler(sampleCallback)
+    );
     const firstRun = testRender.result.current;
     testRender.rerender();
     const secondRun = testRender.result.current;
     expect(firstRun).toBe(secondRun);
   });
 
+  test('should return same function if dependency list is empty', () => {
+    const testRender = renderHook(
+      ({ deplist }) => useHandler(sampleCallback, deplist),
+      { initialProps: { deplist: [] } }
+    );
+    const firstRun = testRender.result.current;
+    testRender.rerender({ deplist: [] });
+    const secondRun = testRender.result.current;
+    expect(firstRun).toBe(secondRun);
+  });
+
+  test('should return same function if dependencies do not change', () => {
+    const testRender = renderHook(
+      ({ deplist }) => useHandler(sampleCallback, deplist),
+      { initialProps: { deplist: [1, 2, 3, '123'] } }
+    );
+    const firstRun = testRender.result.current;
+    testRender.rerender({ deplist: [1, 2, 3, '123'] });
+    const secondRun = testRender.result.current;
+    expect(firstRun).toBe(secondRun);
+  });
+
+  test('should return different function if dependencies change', () => {
+    const testRender = renderHook(
+      ({ deplist }) => useHandler(sampleCallback, deplist),
+      { initialProps: { deplist: [1, 2, 3, '123'] } }
+    );
+    const firstRun = testRender.result.current;
+    testRender.rerender({ deplist: [1, 2, 3, '1234'] });
+    const secondRun = testRender.result.current;
+    expect(firstRun).not.toBe(secondRun);
+  });
+
   test('should return same function if callback changes after rerender', () => {
     const testRender = renderHook(
-      ({ callback }) => useHandler<string, number>(callback),
+      ({ callback }) => useHandler(callback),
       { initialProps: { callback: sampleCallback } }
     );
     const firstRun = testRender.result.current;
@@ -44,7 +72,7 @@ describe('useHandler', () => {
 
   test('should run same callback between rerender', () => {
     const testRender = renderHook(
-      ({ callback }) => useHandler<string, number>(callback),
+      ({ callback }) => useHandler(callback),
       { initialProps: { callback: sampleCallback } }
     );
     testRender.result.current('test', 123);
@@ -57,7 +85,7 @@ describe('useHandler', () => {
 
   test('should run different callbacks once between rerender', () => {
     const testRender = renderHook(
-      ({ callback }) => useHandler<string, number>(callback),
+      ({ callback }) => useHandler(callback),
       { initialProps: { callback: sampleCallback } }
     );
     testRender.result.current('test', 123);
@@ -86,21 +114,21 @@ describe('useHandler', () => {
 
 describe('useParamsHandler', () => {
 
-  test('should return a handler creator if we pass callback without params', () => {
+  test('should return a handler creator if we pass callback', () => {
     const testRender = renderHook(
       () => useParamsHandler(sampleCallback)
     );
     expect(typeof testRender.result.current).toBe('function');
   });
 
-  test('should return a handler creator if we pass callback', () => {
+  test('should return a callback from a handler creator if we pass callback', () => {
     const testRender = renderHook(
-      () => useParamsHandler<string, number, [string, number]>(sampleCallback)
+      () => useParamsHandler(sampleCallback)
     );
-    expect(typeof testRender.result.current).toBe('function');
+    expect(typeof testRender.result.current('123')).toBe('function');
   });
 
-  test('should return a different handler creator every time if we pass callback without params', () => {
+  test('should return a different handler creator every time', () => {
     const testRender = renderHook(
       () => useParamsHandler(sampleCallback)
     );
@@ -111,60 +139,86 @@ describe('useParamsHandler', () => {
   });
 
   test('should return different function for different key param', () => {
-    const testRender = renderHook(() => useParamsHandler<string, number, [string, number]>(sampleCallback));
-    const firstRun = testRender.result.current('test', 123);
-    const secondRun = testRender.result.current('test2', 123);
+    const testRender = renderHook(() => useParamsHandler(sampleCallback));
+    const firstRun = testRender.result.current('test');
+    const secondRun = testRender.result.current('test2');
+    expect(firstRun).not.toBe(secondRun);
+  });
+
+  test('should return different function for different key param in object', () => {
+    const testRender = renderHook(() => useParamsHandler(sampleCallback));
+    const firstRun = testRender.result.current({ key: 'test', data: 123 });
+    const secondRun = testRender.result.current({ key: 'test2', data: 123 });
     expect(firstRun).not.toBe(secondRun);
   });
 
   test('should return different function after rerender and different key param', () => {
-    const testRender = renderHook(() => useParamsHandler<string, number, [string, number]>(sampleCallback));
-    const firstRun = testRender.result.current('test', 123);
+    const testRender = renderHook(() => useParamsHandler(sampleCallback));
+    const firstRun = testRender.result.current('test');
     testRender.rerender();
-    const secondRun = testRender.result.current('test2', 123);
+    const secondRun = testRender.result.current('test2');
     expect(firstRun).not.toBe(secondRun);
   });
 
-  test('should return same function if callback changes after rerender', () => {
+  test('should return different function after rerender and different key in object', () => {
+    const testRender = renderHook(() => useParamsHandler(sampleCallback));
+    const firstRun = testRender.result.current({ key: 'test', data: 123 });
+    testRender.rerender();
+    const secondRun = testRender.result.current({ key: 'test2', data: 123 });
+    expect(firstRun).not.toBe(secondRun);
+  });
+
+  test('should return same function if callback changes after rerender for same key', () => {
     const testRender = renderHook(
-      ({ callback }) => useParamsHandler<string, number, [string, number]>(callback),
+      ({ callback }) => useParamsHandler(callback),
       { initialProps: { callback: sampleCallback } }
     );
-    const firstRun = testRender.result.current('test', 123);
+    const firstRun = testRender.result.current({ key: 'test', num: 123 });
     testRender.rerender({ callback: secondSampleCallback });
-    const secondRun = testRender.result.current('test', 456);
+    const secondRun = testRender.result.current({ key: 'test', num: 456 });
     expect(firstRun).toBe(secondRun);
   });
 
-  test('should always return same functions for multiple out of order keys, mid renders, between renders and at callback changes', () => {
+  test('should return same function if callback changes after rerender for same key alone and then in object', () => {
     const testRender = renderHook(
-      ({ callback }) => useParamsHandler<string, number, [string, number]>(callback),
+      ({ callback }) => useParamsHandler(callback),
+      { initialProps: { callback: sampleCallback } }
+    );
+    const firstRun = testRender.result.current('test');
+    testRender.rerender({ callback: secondSampleCallback });
+    const secondRun = testRender.result.current({ key: 'test', num: 456 });
+    expect(firstRun).toBe(secondRun);
+  });
+
+  test('should always return same functions for multiple out of order keys, with changing passed params, mid renders, between renders and at callback changes', () => {
+    const testRender = renderHook(
+      ({ callback }) => useParamsHandler(callback),
       { initialProps: { callback: sampleCallback } }
     );
 
-    const firstRun1 = testRender.result.current('test1', 123);
-    const firstRun2 = testRender.result.current('test2', 654);
-    const firstRun3 = testRender.result.current('test3', 321);
-    const firstRun4 = testRender.result.current('test4', 456);
+    const firstRun1 = testRender.result.current('test1');
+    const firstRun2 = testRender.result.current('test2');
+    const firstRun3 = testRender.result.current('test3');
+    const firstRun4 = testRender.result.current('test4');
 
     testRender.rerender({ callback: secondSampleCallback });
 
-    const secondRun4 = testRender.result.current('test4', 467);
-    const secondRun2 = testRender.result.current('test2', 937);
-    const secondRun3 = testRender.result.current('test3', 104);
-    const secondRun1 = testRender.result.current('test1', 274);
+    const secondRun4 = testRender.result.current({ key: 'test4', num: 467 });
+    const secondRun2 = testRender.result.current({ key: 'test2', num: 937 });
+    const secondRun3 = testRender.result.current({ key: 'test3', num: 104 });
+    const secondRun1 = testRender.result.current({ key: 'test1', num: 274 });
 
-    const thirdRun1 = testRender.result.current('test1', 443);
-    const thirdRun4 = testRender.result.current('test4', 675);
-    const thirdRun3 = testRender.result.current('test3', 385);
-    const thirdRun2 = testRender.result.current('test2', 753);
+    const thirdRun1 = testRender.result.current('test1');
+    const thirdRun4 = testRender.result.current('test4');
+    const thirdRun3 = testRender.result.current('test3');
+    const thirdRun2 = testRender.result.current('test2');
 
     testRender.rerender({ callback: sampleCallback });
 
-    const fourthRun2 = testRender.result.current('test2', 368);
-    const fourthRun3 = testRender.result.current('test3', 109);
-    const fourthRun1 = testRender.result.current('test1', 468);
-    const fourthRun4 = testRender.result.current('test4', 211);
+    const fourthRun2 = testRender.result.current({ key: 'test2', numba: 368 });
+    const fourthRun3 = testRender.result.current({ key: 'test3', numba: 109 });
+    const fourthRun1 = testRender.result.current({ key: 'test1', numba: 468 });
+    const fourthRun4 = testRender.result.current({ key: 'test4', numba: 211 });
 
     expect(firstRun1).toBe(secondRun1);
     expect(firstRun2).toBe(secondRun2);
@@ -184,39 +238,73 @@ describe('useParamsHandler', () => {
 
   test('should run different callbacks between rerender', () => {
     const testRender = renderHook(
-      ({ callback }) => useParamsHandler<string, number, [string, number]>(callback),
+      ({ callback }) => useParamsHandler(callback),
       { initialProps: { callback: sampleCallback } }
     );
-    testRender.result.current('test', 123)('test2', 456);
+    testRender.result.current({ key: 'test', num: 123 })('test2', 456);
     testRender.rerender({ callback: secondSampleCallback });
-    testRender.result.current('test3', 321)('test4', 654);
-    expect(sampleCallback).toHaveBeenNthCalledWith(1, 'test', 123, 'test2', 456);
+    testRender.result.current({ key: 'test3', num: 321 })('test4', 654);
+    expect(sampleCallback).toHaveBeenNthCalledWith(1, { key: 'test', num: 123 }, 'test2', 456);
     expect(sampleCallback).toHaveBeenCalledTimes(1);
-    expect(secondSampleCallback).toHaveBeenNthCalledWith(1,'test3', 321, 'test4', 654);
+    expect(secondSampleCallback).toHaveBeenNthCalledWith(1,{ key: 'test3', num: 321 }, 'test4', 654);
     expect(secondSampleCallback).toHaveBeenCalledTimes(1);
   });
 
   test('should run same callback between rerender', () => {
     const testRender = renderHook(
-      ({ callback }) => useParamsHandler<string, number, [string, number]>(callback),
+      ({ callback }) => useParamsHandler(callback),
       { initialProps: { callback: sampleCallback } }
     );
-    testRender.result.current('test', 123)('test2', 456);
+    testRender.result.current({ key: 'test', num: 123 })('test2', 456);
     testRender.rerender();
-    testRender.result.current('test3', 321)('test4', 654);
-    expect(sampleCallback).toHaveBeenNthCalledWith(1, 'test', 123, 'test2', 456);
-    expect(sampleCallback).toHaveBeenNthCalledWith(2, 'test3', 321, 'test4', 654);
+    testRender.result.current({ key: 'test3', num: 321 })('test4', 654);
+    expect(sampleCallback).toHaveBeenNthCalledWith(1, { key: 'test', num: 123 }, 'test2', 456);
+    expect(sampleCallback).toHaveBeenNthCalledWith(2, { key: 'test3', num: 321 }, 'test4', 654);
     expect(sampleCallback).toHaveBeenCalledTimes(2);
   });
 
-  test('should allow to skip callback params', () => {
+  test('should return same function if dependencies do not change', () => {
     const testRender = renderHook(
-      ({ callback }) => useParamsHandler<string, number>(callback),
-      { initialProps: { callback: sampleCallback } }
+      ({ deplist }) => useParamsHandler(sampleCallback, deplist),
+      { initialProps: { deplist: [1, 2, 3, '123'] } }
     );
-    testRender.result.current('test', 123)();
-    expect(sampleCallback).toHaveBeenNthCalledWith(1, 'test', 123);
-    expect(sampleCallback).toHaveBeenCalledTimes(1);
+    const firstRun = testRender.result.current('test');
+    testRender.rerender({ deplist: [1, 2, 3, '123'] });
+    const secondRun = testRender.result.current('test');
+    expect(firstRun).toBe(secondRun);
+  });
+
+  test('should return same function if dependency list is empty', () => {
+    const testRender = renderHook(
+      ({ deplist }) => useParamsHandler(sampleCallback, deplist),
+      { initialProps: { deplist: [] } }
+    );
+    const firstRun = testRender.result.current('test');
+    testRender.rerender({ deplist: [] });
+    const secondRun = testRender.result.current('test');
+    expect(firstRun).toBe(secondRun);
+  });
+
+  test('should return different function if dependency list changes', () => {
+    const testRender = renderHook(
+      ({ deplist }) => useParamsHandler(sampleCallback, deplist),
+      { initialProps: { deplist: [1, 2, 3, '123'] } }
+    );
+    const firstRun = testRender.result.current('test');
+    testRender.rerender({ deplist: [1, 2, 3, '1234'] });
+    const secondRun = testRender.result.current('test');
+    expect(firstRun).not.toBe(secondRun);
+  });
+
+  test('should return different function if dependency list does not change but keys do', () => {
+    const testRender = renderHook(
+      ({ deplist }) => useParamsHandler(sampleCallback, deplist),
+      { initialProps: { deplist: [1, 2, 3, '123'] } }
+    );
+    const firstRun = testRender.result.current('test');
+    testRender.rerender({ deplist: [1, 2, 3, '123'] });
+    const secondRun = testRender.result.current('test2');
+    expect(firstRun).not.toBe(secondRun);
   });
 
 });

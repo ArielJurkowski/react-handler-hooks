@@ -7,9 +7,8 @@ import {useParamsHandler} from '../hooks/useParamsHandler';
 const BenchmarkUseParamsHandler: FC<BenchmarkProps> = props => {
   const tools = useBenchmark(props);
 
-  const callback = useParamsHandler<Key, [string, number, boolean, HTMLDivElement]>(
-    (key: Key, a, b, c, element) => {}
-  );
+  const callback = useParamsHandler((key: Key, a: string, b: number, c: boolean, element: HTMLDivElement) => {
+  });
 
   return (
     <>

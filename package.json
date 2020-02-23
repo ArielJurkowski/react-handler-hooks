@@ -1,6 +1,6 @@
 {
   "name": "react-handler-hooks",
-  "version": "1.3.0",
+  "version": "2.0.0",
   "description": "React hooks for persistent and parameterizable callbacks",
   "author": {
     "url": "https://github.com/ArielJurkowski",
@@ -22,10 +22,12 @@
   },
   "scripts": {
     "test": "jest",
-    "test:watch": "jest --watchAll",
+    "test:watch": "jest --watch",
     "build": "tsc"
   },
   "keywords": [
+    "react",
+    "reactjs",
     "hook",
     "hooks",
     "handler",
@@ -39,7 +41,9 @@
     "param",
     "params",
     "parameters",
-    "persistent"
+    "persistent",
+    "typescript",
+    "typed"
   ],
   "files": [
     "dist"
