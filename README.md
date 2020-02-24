@@ -6,6 +6,9 @@ React hooks for persistent and parameterizable callbacks - useCallback on steroi
 ```bash
 npm i react-handler-hooks
 ```
+```bash
+yarn add react-handler-hooks
+```
 ## What are these?
 Two hooks that fully replace the useCallback hook: **useHandler** and **useParamsHandler**. And they have many benefits!
 #### Pros
