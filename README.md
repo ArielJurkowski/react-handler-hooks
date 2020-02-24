@@ -1,6 +1,7 @@
 # 🐱 react-handler-hooks
 React hooks for persistent and parameterizable callbacks - useCallback on steroids!
-![Test & Build](https://github.com/ArielJurkowski/react-handler-hooks/workflows/Actions/badge.svg?branch=master)
+
+![Build](https://github.com/ArielJurkowski/react-handler-hooks/workflows/Build/badge.svg?branch=master)
 ## Installation
 ```bash
 npm i react-handler-hooks
