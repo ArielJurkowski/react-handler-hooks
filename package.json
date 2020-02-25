@@ -1,7 +1,7 @@
 {
   "name": "react-handler-hooks",
-  "version": "2.0.0",
-  "description": "React hooks for persistent and parameterizable callbacks",
+  "version": "2.1.0",
+  "description": "React hooks for persistent and parameterizable callbacks - useCallback on steroids!",
   "author": {
     "url": "https://github.com/ArielJurkowski",
     "email": "ariel.jurkowski@gmail.com",
@@ -17,13 +17,15 @@
     "url": "https://github.com/ArielJurkowski/react-handler-hooks/issues"
   },
   "main": "dist/index.js",
+  "module": "dist-es/index.js",
+  "types": "dist/index.d.ts",
   "directories": {
     "lib": "dist"
   },
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
-    "build": "tsc"
+    "build": "tsc && tsc -p tsconfig.es.json"
   },
   "keywords": [
     "react",
@@ -46,7 +48,10 @@
     "typed"
   ],
   "files": [
-    "dist"
+    "dist",
+    "dist-es",
+    "LICENSE.md",
+    "READNE.md"
   ],
   "peerDependencies": {
     "react": ">=16.8.0",

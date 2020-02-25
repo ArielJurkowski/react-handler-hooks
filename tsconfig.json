@@ -1,13 +1,13 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "target": "es5",
     "module": "commonjs",
-    "lib": ["es2018", "dom"],
+    "moduleResolution": "node",
+    "lib": ["es2015"],
     "declaration": true,
-    "sourceMap": true,
+    "sourceMap": false,
     "outDir": "./dist",
     "rootDir": "./src",
-    "removeComments": true,
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
@@ -16,11 +16,12 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
-    "esModuleInterop": true,
+    "esModuleInterop": true
   },
   "exclude": [
     "./test",
     "./dist",
+    "./dist-es",
     "./node_modules",
     "./benchmark"
   ]
